@@ -161,17 +161,25 @@ export default function QuestionForm({ onComplete }: QuestionFormProps) {
   };
 
   const handleSubmit = () => {
+    // Convert string 'true'/'false' to boolean
+    const getBooleanValue = (value: any): boolean => {
+      if (typeof value === 'boolean') return value;
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return false;
+    };
+
     const completeAnswers: UserAnswers = {
       age: answers.age as number | null,
       gender: answers.gender as 'male' | 'female' | null,
       proteinIntake: answers.proteinIntake as 'low' | 'medium' | 'high' | null,
       exerciseFrequency: answers.exerciseFrequency as 'none' | 'low' | 'medium' | 'high' | null,
       fishConsumption: answers.fishConsumption as 'never' | 'rare' | 'weekly' | 'daily' | null,
-      heartHealthConcern: answers.heartHealthConcern === 'true' || answers.heartHealthConcern === true,
+      heartHealthConcern: getBooleanValue(answers.heartHealthConcern),
       vegetableFruitIntake: answers.vegetableFruitIntake as 'poor' | 'fair' | 'good' | 'excellent' | null,
       fatigueLevel: answers.fatigueLevel as 'none' | 'low' | 'medium' | 'high' | null,
       healthGoals: (answers.healthGoals as string[]) || [],
-      hasAllergies: answers.hasAllergies === 'true' || answers.hasAllergies === true,
+      hasAllergies: getBooleanValue(answers.hasAllergies),
       allergies: (answers.allergies as string[]) || []
     };
     onComplete(completeAnswers);
@@ -183,7 +191,14 @@ export default function QuestionForm({ onComplete }: QuestionFormProps) {
       if (currentQuestion.type === 'multiselect') {
         return Array.isArray(value) && value.length > 0;
       }
-      return value !== null && value !== undefined && value !== '';
+      // Check if value is not null, undefined, or empty string
+      if (value === null || value === undefined) {
+        return false;
+      }
+      if (typeof value === 'string' && value === '') {
+        return false;
+      }
+      return true;
     }
     return true;
   };
