@@ -185,21 +185,32 @@ export default function QuestionForm({ onComplete }: QuestionFormProps) {
     onComplete(completeAnswers);
   };
 
-  const canProceed = () => {
-    if (currentQuestion.required) {
-      const value = answers[currentQuestion.id as keyof UserAnswers];
-      if (currentQuestion.type === 'multiselect') {
-        return Array.isArray(value) && value.length > 0;
-      }
-      // Check if value is not null, undefined, or empty string
-      if (value === null || value === undefined) {
-        return false;
-      }
-      if (typeof value === 'string' && value === '') {
-        return false;
-      }
+  const canProceed = (): boolean => {
+    if (!currentQuestion.required) {
       return true;
     }
+
+    const value = answers[currentQuestion.id as keyof UserAnswers];
+    
+    // For multiselect, check if array has items
+    if (currentQuestion.type === 'multiselect') {
+      return Array.isArray(value) && value.length > 0;
+    }
+    
+    // For number type, check if it's a valid positive number
+    if (currentQuestion.type === 'number') {
+      if (typeof value === 'number') {
+        return !isNaN(value) && value > 0;
+      }
+      return false;
+    }
+    
+    // For other types (select), check if value is not null/undefined
+    // Since select values are always valid strings from options, we just need to check existence
+    if (value === null || value === undefined) {
+      return false;
+    }
+    
     return true;
   };
 
