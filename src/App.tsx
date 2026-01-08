@@ -9,9 +9,14 @@ function App() {
   const [showWelcome, setShowWelcome] = useState(true);
 
   const handleComplete = (answers: UserAnswers) => {
-    const recommendation = generateRecommendations(answers);
-    setResult(recommendation);
-    setShowWelcome(false);
+    try {
+      const recommendation = generateRecommendations(answers);
+      setResult(recommendation);
+      setShowWelcome(false);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      alert('Có lỗi xảy ra khi tạo thực đơn. Vui lòng thử lại.');
+    }
   };
 
   const handleRestart = () => {
