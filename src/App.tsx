@@ -1,10 +1,15 @@
 import { useState } from 'react';
+import Layout from './components/Layout';
 import QuestionForm from './components/QuestionForm';
 import ResultDisplay from './components/ResultDisplay';
+import CustomerManagement from './components/CustomerManagement';
 import { UserAnswers, RecommendationResult } from './types';
 import { generateRecommendations } from './utils/recommendation';
 
+type Tab = 'menu' | 'customers';
+
 function App() {
+  const [activeTab, setActiveTab] = useState<Tab>('menu');
   const [result, setResult] = useState<RecommendationResult | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
 
@@ -24,9 +29,9 @@ function App() {
     setShowWelcome(true);
   };
 
-  if (showWelcome && !result) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4">
+  const renderMenuContent = () => {
+    if (showWelcome && !result) {
+      return (
         <div className="max-w-2xl mx-auto text-center">
           <div className="bg-white rounded-lg shadow-xl p-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -53,24 +58,21 @@ function App() {
             </button>
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (result) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4">
-        <ResultDisplay result={result} onRestart={handleRestart} />
-      </div>
-    );
-  }
+    if (result) {
+      return <ResultDisplay result={result} onRestart={handleRestart} />;
+    }
+
+    return <QuestionForm onComplete={handleComplete} />;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4">
-      <QuestionForm onComplete={handleComplete} />
-    </div>
+    <Layout activeTab={activeTab} onTabChange={setActiveTab}>
+      {activeTab === 'menu' ? renderMenuContent() : <CustomerManagement />}
+    </Layout>
   );
 }
 
 export default App;
-

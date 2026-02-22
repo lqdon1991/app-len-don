@@ -39,3 +39,37 @@ export interface RecommendationResult {
   };
 }
 
+// ERP/CRM - Contact Management
+export type ContactCategory = 
+  | 'friends'      // Bạn bè
+  | 'colleagues'   // Đồng nghiệp
+  | 'neighbors'    // Hàng xóm
+  | 'classmates'   // Bạn học
+  | 'social'       // QHXH (Quan hệ xã hội)
+  | 'other';       // Khác
+
+export interface PurchaseRecord {
+  id: string;
+  date: string;
+  description: string;
+  amount?: number;
+  notes?: string;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  age?: number;
+  income?: string;
+  family?: string;
+  hasHouse: boolean;
+  hasCar: boolean;
+  category: ContactCategory;
+  purchaseHistory: PurchaseRecord[];
+  phone?: string;
+  email?: string;
+  address?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
