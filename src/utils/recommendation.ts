@@ -279,7 +279,8 @@ function evaluateVitaminsNeed(answers: UserAnswers): boolean {
 function generateSummary(
   answers: UserAnswers, 
   products: NutriliteProduct[],
-  needs: { needsProtein: boolean; needsOmega3: boolean; needsVitamins: boolean; hasBodykey: boolean }
+  needs: { needsProtein: boolean; needsOmega3: boolean; needsVitamins: boolean; hasBodykey: boolean },
+  nutritionAnalysis?: NutritionAnalysis
 ): string {
   let summary = 'Dựa trên thông tin bạn cung cấp, chúng tôi đã xây dựng một thực đơn dinh dưỡng tối ưu dựa trên 3 dưỡng chất cơ bản: ';
   
