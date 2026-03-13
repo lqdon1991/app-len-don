@@ -179,6 +179,13 @@ function MealProductCard({ product }: { product: NutriliteProduct }) {
               (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x200?text=Nutrilite';
             }}
           />
+          <p className="mt-1 text-[10px] text-gray-500">
+            Nguồn ảnh: {product.officialLink ? (
+              <a className="underline" href={product.officialLink} target="_blank" rel="noopener noreferrer">
+                Amway Việt Nam
+              </a>
+            ) : 'Amway Việt Nam'}
+          </p>
         </div>
         <div className="flex-1 min-w-0">
           <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-1 border ${typeInfo.color}`}>
@@ -211,6 +218,13 @@ function ProductCard({ product }: { product: NutriliteProduct }) {
               (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=Nutrilite';
             }}
           />
+          <p className="mt-2 text-xs text-gray-500 text-center">
+            Nguồn ảnh: {product.officialLink ? (
+              <a className="underline" href={product.officialLink} target="_blank" rel="noopener noreferrer">
+                Amway Việt Nam
+              </a>
+            ) : 'Amway Việt Nam'}
+          </p>
           {product.officialLink && (
             <a
               href={product.officialLink}

@@ -19,9 +19,9 @@ export const nutriliteProducts: NutriliteProduct[] = [
       'Người muốn kiểm soát cân nặng'
     ],
     dosage: 'Pha 1 muỗng (10g) với nước hoặc đồ uống yêu thích. Sử dụng 1-2 lần mỗi ngày, tốt nhất sau khi tập luyện hoặc giữa các bữa ăn.',
-    imageUrl: 'https://www.amway.com.vn/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/1/1/110415.jpg',
+    imageUrl: '/images/products/all-plant-protein.jpg',
     nutritionType: 'protein',
-    officialLink: 'https://www.amway.com.vn/san-pham/nutrilite-all-plant-protein'
+    officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/Dinh-D%C6%B0%E1%BB%A1ng-Thi%E1%BA%BFt-Y%E1%BA%BFu-H%E1%BA%B1ng-Ng%C3%A0y/TPBVSK-Nutrilite%E2%84%A2-All-Plant-Protein-Powder/p/110415'
   },
   {
     id: 'advanced-triple-omega-3',
@@ -41,9 +41,9 @@ export const nutriliteProducts: NutriliteProduct[] = [
       'Người muốn tăng cường sức khỏe não bộ'
     ],
     dosage: 'Uống 1-2 viên mỗi ngày, tốt nhất là ngay sau bữa ăn để tăng cường hấp thu.',
-    imageUrl: 'https://www.amway.com.vn/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/1/2/126136.jpg',
+    imageUrl: '/images/products/advanced-triple-omega-3.jpg',
     nutritionType: 'fat',
-    officialLink: 'https://www.amway.com.vn/san-pham/nutrilite-advanced-triple-omega-3'
+    officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/Dinh-D%C6%B0%E1%BB%A1ng-Thi%E1%BA%BFt-Y%E1%BA%BFu-H%E1%BA%B1ng-Ng%C3%A0y/TPBVSK-Nutrilite%E2%84%A2-Advanced-Triple-Omega-3/p/126136'
   },
   {
     id: 'daily',
@@ -63,7 +63,7 @@ export const nutriliteProducts: NutriliteProduct[] = [
       'Người trên 18 tuổi cần bổ sung dinh dưỡng cơ bản'
     ],
     dosage: 'Uống 1 viên mỗi ngày cùng với bữa ăn để tăng cường hấp thu.',
-    imageUrl: 'https://www.amway.com.vn/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/1/1/110415.jpg',
+    imageUrl: '/images/products/double-x.png',
     nutritionType: 'vitamin-mineral'
   },
   {
@@ -84,8 +84,9 @@ export const nutriliteProducts: NutriliteProduct[] = [
       'Người muốn chống lão hóa và bảo vệ tế bào'
     ],
     dosage: 'Uống 2 lần mỗi ngày, mỗi lần 1 viên của mỗi loại cùng với bữa ăn.',
-    imageUrl: 'https://www.amway.com.vn/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/1/1/110415.jpg',
-    nutritionType: 'vitamin-mineral'
+    imageUrl: '/images/products/double-x.png',
+    nutritionType: 'vitamin-mineral',
+    officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/Dinh-D%C6%B0%E1%BB%A1ng-Thi%E1%BA%BFt-Y%E1%BA%BFu-H%E1%BA%B1ng-Ng%C3%A0y/TP-BVSK-Nutrilite-Double-X/p/120843'
   },
   {
     id: 'triple-x',
@@ -105,9 +106,10 @@ export const nutriliteProducts: NutriliteProduct[] = [
       'Người muốn tăng cường sức đề kháng'
     ],
     dosage: 'Uống 1 viên mỗi ngày cùng với bữa ăn để tăng cường hấp thu. Có thể chia làm 3 lần trong ngày để tối ưu hấp thu.',
-    imageUrl: 'https://www.amway.com.vn/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/1/1/110415.jpg',
+    imageUrl: '/images/products/double-x.png',
     nutritionType: 'vitamin-mineral',
-    officialLink: 'https://www.amway.com.vn/san-pham/nutrilite-triple-x'
+    // Trang Triple X không luôn có trên catalog VN; dùng trang Double X chính thức để tham khảo nhóm vitamin-khoáng
+    officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/Dinh-D%C6%B0%E1%BB%A1ng-Thi%E1%BA%BFt-Y%E1%BA%BFu-H%E1%BA%B1ng-Ng%C3%A0y/TP-BVSK-Nutrilite-Double-X/p/120843'
   },
   {
     id: 'bodykey',
@@ -128,8 +130,8 @@ export const nutriliteProducts: NutriliteProduct[] = [
       'Người có lối sống bận rộn'
     ],
     dosage: 'Pha 2 muỗng (khoảng 40g) với 250ml nước hoặc sữa. Sử dụng thay thế bữa sáng để cung cấp đầy đủ dinh dưỡng và vitamin, khoáng chất.',
-    imageUrl: 'https://www.amway.com.vn/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/1/1/110415.jpg',
+    imageUrl: '/images/products/bodykey.jpg',
     nutritionType: 'complete-nutrition',
-    officialLink: 'https://www.amway.com.vn/san-pham/bodykey'
+    officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/H%E1%BB%97-Tr%E1%BB%A3-Qu%E1%BA%A3n-L%C3%BD-C%C3%A2n-N%E1%BA%B7ng/Th%E1%BB%B1c-ph%E1%BA%A9m-d%C3%B9ng-cho-ch%E1%BA%BF-%C4%91%E1%BB%99-%C4%83n-%C4%91%E1%BA%B7c-bi%E1%BB%87t-BodyKey-By-Nutrilite%E2%84%A2-%E2%80%93-V%E1%BB%8B-Tr%C3%A0-S%E1%BB%AFa/p/124499'
   }
 ];
