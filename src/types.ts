@@ -29,6 +29,30 @@ export interface NutriliteProduct {
   officialLink?: string;
 }
 
+export interface NutritionNeeds {
+  waterMl: number;
+  caloriesKcal: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  omega3Mg: number;
+}
+
+export interface NutritionAnalysis {
+  needs: NutritionNeeds;
+  estimatedFromDiet: {
+    proteinG: number;
+    omega3Mg: number;
+    micronutrientCoveragePercent: number;
+  };
+  gaps: {
+    proteinG: number;
+    omega3Mg: number;
+    micronutrientCoveragePercent: number;
+  };
+  notes: string[];
+}
+
 export interface RecommendationResult {
   products: NutriliteProduct[];
   summary: string;
@@ -37,6 +61,7 @@ export interface RecommendationResult {
     afternoon: NutriliteProduct[];
     evening: NutriliteProduct[];
   };
+  nutritionAnalysis?: NutritionAnalysis;
 }
 
 // ERP/CRM - Contact Management

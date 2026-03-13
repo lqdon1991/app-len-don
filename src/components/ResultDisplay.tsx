@@ -30,6 +30,60 @@ export default function ResultDisplay({ result, onRestart }: ResultDisplayProps)
         <p className="text-gray-700 leading-relaxed">{result.summary}</p>
       </div>
 
+      {result.nutritionAnalysis && (
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">📊 Phân tích nhu cầu dinh dưỡng (ước tính)</h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-4">
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-2">Nhu cầu chuẩn mỗi ngày</h3>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>Nước: <strong>{result.nutritionAnalysis.needs.waterMl} ml</strong></li>
+                <li>Năng lượng: <strong>{result.nutritionAnalysis.needs.caloriesKcal} kcal</strong></li>
+                <li>Đạm: <strong>{result.nutritionAnalysis.needs.proteinG} g</strong></li>
+                <li>Tinh bột: <strong>{result.nutritionAnalysis.needs.carbsG} g</strong></li>
+                <li>Chất béo: <strong>{result.nutritionAnalysis.needs.fatG} g</strong></li>
+                <li>Omega‑3: <strong>{result.nutritionAnalysis.needs.omega3Mg} mg</strong></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-2">Ước tính từ chế độ ăn hiện tại</h3>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>Đạm: ~<strong>{result.nutritionAnalysis.estimatedFromDiet.proteinG} g/ngày</strong></li>
+                <li>Omega‑3: ~<strong>{result.nutritionAnalysis.estimatedFromDiet.omega3Mg} mg/ngày</strong></li>
+                <li>
+                  Vitamin & khoáng: 
+                  <strong> {result.nutritionAnalysis.estimatedFromDiet.micronutrientCoveragePercent}%</strong> nhu cầu
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-2">Thiếu hụt ước tính</h3>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>
+                  Thiếu đạm: 
+                  <strong> {result.nutritionAnalysis.gaps.proteinG} g/ngày</strong>
+                </li>
+                <li>
+                  Thiếu Omega‑3: 
+                  <strong> {result.nutritionAnalysis.gaps.omega3Mg} mg/ngày</strong>
+                </li>
+                <li>
+                  Vitamin & khoáng còn thiếu khoảng 
+                  <strong> {result.nutritionAnalysis.gaps.micronutrientCoveragePercent}%</strong> so với nhu cầu
+                </li>
+              </ul>
+            </div>
+          </div>
+          {result.nutritionAnalysis.notes.length > 0 && (
+            <ul className="mt-2 text-sm text-gray-700 list-disc list-inside space-y-1">
+              {result.nutritionAnalysis.notes.map((note, idx) => (
+                <li key={idx}>{note}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       {/* Thực đơn hàng ngày - Ưu tiên hiển thị */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-bold mb-6 text-gray-800">📅 Thực đơn hàng ngày</h2>

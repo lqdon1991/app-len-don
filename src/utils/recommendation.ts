@@ -1,8 +1,9 @@
-import { UserAnswers, NutriliteProduct, RecommendationResult } from '../types';
+import { UserAnswers, NutriliteProduct, RecommendationResult, NutritionAnalysis, NutritionNeeds } from '../types';
 import { nutriliteProducts } from '../data/products';
 
 export function generateRecommendations(answers: UserAnswers): RecommendationResult {
   const recommendedProducts: NutriliteProduct[] = [];
+  const nutritionAnalysis = calculateNutritionAnalysis(answers);
   
   // Đánh giá nhu cầu về 3 dưỡng chất cơ bản
   const needsProtein = evaluateProteinNeed(answers);
@@ -89,7 +90,7 @@ export function generateRecommendations(answers: UserAnswers): RecommendationRes
     needsOmega3,
     needsVitamins,
     hasBodykey: !!bodykey
-  });
+  }, nutritionAnalysis);
 
   return {
     products: recommendedProducts,
@@ -98,7 +99,139 @@ export function generateRecommendations(answers: UserAnswers): RecommendationRes
       morning,
       afternoon,
       evening
-    }
+    },
+    nutritionAnalysis
+  };
+}
+
+function calculateNutritionAnalysis(answers: UserAnswers): NutritionAnalysis {
+  // Nhu cầu chuẩn ước tính cho người trưởng thành
+  const isMale = answers.gender === 'male';
+  const age = answers.age ?? 30;
+
+  // Ước lượng cân nặng và nhu cầu năng lượng cơ bản
+  const estimatedWeightKg = isMale ? 70 : 55;
+  const baseCalories = isMale ? 2400 : 2000;
+
+  // Điều chỉnh theo mức độ vận động
+  const activityFactor =
+    answers.exerciseFrequency === 'high'
+      ? 1.2
+      : answers.exerciseFrequency === 'medium'
+        ? 1.1
+        : 1.0;
+
+  const caloriesKcal = Math.round(baseCalories * activityFactor);
+
+  // Nhu cầu nước: 35 ml/kg
+  const waterMl = Math.round(estimatedWeightKg * 35);
+
+  // Nhu cầu protein: 1.4 g/kg (tăng nếu vận động nhiều)
+  const proteinPerKg =
+    answers.exerciseFrequency === 'high'
+      ? 1.8
+      : answers.exerciseFrequency === 'medium'
+        ? 1.5
+        : 1.2;
+  const proteinG = Math.round(estimatedWeightKg * proteinPerKg);
+
+  // Carb ~50% năng lượng, fat ~30%
+  const carbsG = Math.round((caloriesKcal * 0.5) / 4);
+  const fatG = Math.round((caloriesKcal * 0.3) / 9);
+
+  // Omega‑3 (EPA + DHA) mục tiêu: 800–1000 mg
+  const omega3Mg = isMale ? 1000 : 800;
+
+  const needs: NutritionNeeds = {
+    waterMl,
+    caloriesKcal,
+    proteinG,
+    carbsG,
+    fatG,
+    omega3Mg
+  };
+
+  // Ước lượng lượng hiện tại từ khảo sát
+  let proteinCoverage = 0.8;
+  if (answers.proteinIntake === 'low') proteinCoverage = 0.6;
+  if (answers.proteinIntake === 'high') proteinCoverage = 1.0;
+
+  // Nếu tập nhiều mà ăn đạm thấp thì thực tế còn thiếu hơn
+  if (answers.exerciseFrequency === 'high' && answers.proteinIntake === 'low') {
+    proteinCoverage = 0.5;
+  }
+
+  const estimatedProteinG = Math.round(proteinG * proteinCoverage);
+
+  let omega3Coverage = 0.3;
+  if (answers.fishConsumption === 'weekly') omega3Coverage = 0.6;
+  if (answers.fishConsumption === 'daily') omega3Coverage = 1.0;
+  if (answers.heartHealthConcern) {
+    omega3Coverage = Math.min(omega3Coverage, 0.7);
+  }
+  const estimatedOmega3Mg = Math.round(omega3Mg * omega3Coverage);
+
+  let micronutrientCoverage = 0.8;
+  if (answers.vegetableFruitIntake === 'poor') micronutrientCoverage = 0.4;
+  if (answers.vegetableFruitIntake === 'fair') micronutrientCoverage = 0.6;
+  if (answers.vegetableFruitIntake === 'good') micronutrientCoverage = 0.8;
+  if (answers.vegetableFruitIntake === 'excellent') micronutrientCoverage = 1.0;
+
+  // Căng thẳng, mệt mỏi cao → thực tế nhu cầu tăng, coi như đang thiếu nhiều hơn
+  if (answers.fatigueLevel === 'high') {
+    micronutrientCoverage = Math.max(0.3, micronutrientCoverage - 0.1);
+  }
+
+  const estimatedFromDiet = {
+    proteinG: estimatedProteinG,
+    omega3Mg: estimatedOmega3Mg,
+    micronutrientCoveragePercent: Math.round(micronutrientCoverage * 100)
+  };
+
+  const gaps = {
+    proteinG: Math.max(0, proteinG - estimatedProteinG),
+    omega3Mg: Math.max(0, omega3Mg - estimatedOmega3Mg),
+    micronutrientCoveragePercent: Math.max(
+      0,
+      100 - Math.round(micronutrientCoverage * 100)
+    )
+  };
+
+  const notes: string[] = [];
+
+  notes.push(
+    `Ở độ tuổi khoảng ${age}, nhu cầu ước tính: ~${caloriesKcal} kcal/ngày, khoảng ${proteinG}g đạm, ${carbsG}g tinh bột, ${fatG}g chất béo và ${omega3Mg}mg Omega-3.`
+  );
+
+  if (gaps.proteinG > 0) {
+    notes.push(
+      `Chế độ ăn hiện tại có thể đang thiếu khoảng ${gaps.proteinG}g đạm mỗi ngày so với nhu cầu.`
+    );
+  } else {
+    notes.push('Lượng đạm từ khẩu phần ăn có vẻ tương đối đủ so với nhu cầu.');
+  }
+
+  if (gaps.omega3Mg > 0) {
+    notes.push(
+      `Bạn có thể chưa đạt đủ chuẩn Omega-3 (thiếu khoảng ${gaps.omega3Mg}mg mỗi ngày).`
+    );
+  } else {
+    notes.push('Lượng Omega-3 ước tính từ chế độ ăn khá tốt.');
+  }
+
+  if (gaps.micronutrientCoveragePercent > 0) {
+    notes.push(
+      `Rau và trái cây hiện tại chỉ đáp ứng khoảng ${estimatedFromDiet.micronutrientCoveragePercent}% nhu cầu vitamin và khoáng chất.`
+    );
+  } else {
+    notes.push('Lượng vitamin và khoáng chất từ rau/trái cây tương đối đầy đủ.');
+  }
+
+  return {
+    needs,
+    estimatedFromDiet,
+    gaps,
+    notes
   };
 }
 
