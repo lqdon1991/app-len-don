@@ -5,8 +5,9 @@ import ResultDisplay from './components/ResultDisplay';
 import CustomerManagement from './components/CustomerManagement';
 import { UserAnswers, RecommendationResult } from './types';
 import { generateRecommendations } from './utils/recommendation';
+import ManualLibrary from './components/ManualLibrary';
 
-type Tab = 'menu' | 'customers';
+type Tab = 'menu' | 'customers' | 'manual';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('menu');
@@ -70,7 +71,11 @@ function App() {
 
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {activeTab === 'menu' ? renderMenuContent() : <CustomerManagement />}
+      {activeTab === 'menu'
+        ? renderMenuContent()
+        : activeTab === 'customers'
+          ? <CustomerManagement />
+          : <ManualLibrary />}
     </Layout>
   );
 }

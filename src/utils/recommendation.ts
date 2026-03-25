@@ -10,9 +10,9 @@ export function generateRecommendations(answers: UserAnswers): RecommendationRes
   const needsOmega3 = evaluateOmega3Need(answers);
   const needsVitamins = evaluateVitaminsNeed(answers);
 
-  // Luôn đề xuất Triple X thay vì Daily
-  const tripleX = nutriliteProducts.find(p => p.id === 'triple-x');
-  if (tripleX) recommendedProducts.push(tripleX);
+  // Luôn đề xuất Double X (tại Việt Nam)
+  const doubleX = nutriliteProducts.find(p => p.id === 'double-x');
+  if (doubleX) recommendedProducts.push(doubleX);
 
   // Đề xuất sản phẩm dựa trên nhu cầu
   if (needsProtein) {
@@ -41,22 +41,26 @@ export function generateRecommendations(answers: UserAnswers): RecommendationRes
     morning.push(bodykey);
   }
 
-  // Chia đều Protein, Omega-3 và Triple X ra 3 bữa
+  // Chia đều Protein, Omega-3 và Double X ra 3 bữa
   const protein = recommendedProducts.find(p => p.nutritionType === 'protein');
   const omega3 = recommendedProducts.find(p => p.nutritionType === 'fat');
-  const tripleXProduct = recommendedProducts.find(p => p.id === 'triple-x');
+  const doubleXProduct = recommendedProducts.find(p => p.id === 'double-x');
 
-  // Buổi sáng: 1/3 Triple X (nếu có Bodykey thì chỉ Triple X, không có thì thêm 1/3 protein)
-  if (tripleXProduct) {
-    const tripleXMorning = { ...tripleXProduct, dosage: '1/3 liều lượng (chia từ 1 viên/ngày)' };
-    morning.push(tripleXMorning as NutriliteProduct);
-  }
-  if (protein && !bodykey) {
+  // Buổi sáng: Bodykey (nếu có) + 1/3 Protein + 1/3 Omega-3 + 1/3 Double X
+  if (protein) {
     const proteinMorning = { ...protein, dosage: '1/3 liều lượng (chia từ liều khuyến nghị)' };
     morning.push(proteinMorning as NutriliteProduct);
   }
+  if (omega3) {
+    const omega3Morning = { ...omega3, dosage: '1/3 liều lượng (chia từ 1-2 viên/ngày)' };
+    morning.push(omega3Morning as NutriliteProduct);
+  }
+  if (doubleXProduct) {
+    const doubleXMorning = { ...doubleXProduct, dosage: '1/3 liều lượng (chia từ liều khuyến nghị)' };
+    morning.push(doubleXMorning as NutriliteProduct);
+  }
 
-  // Buổi trưa: 1/3 Protein, 1/3 Omega-3, 1/3 Triple X
+  // Buổi trưa: 1/3 Protein, 1/3 Omega-3, 1/3 Double X
   if (protein) {
     const proteinAfternoon = { ...protein, dosage: '1/3 liều lượng (chia từ liều khuyến nghị)' };
     afternoon.push(proteinAfternoon as NutriliteProduct);
@@ -65,12 +69,12 @@ export function generateRecommendations(answers: UserAnswers): RecommendationRes
     const omega3Afternoon = { ...omega3, dosage: '1/3 liều lượng (chia từ 1-2 viên/ngày)' };
     afternoon.push(omega3Afternoon as NutriliteProduct);
   }
-  if (tripleXProduct) {
-    const tripleXAfternoon = { ...tripleXProduct, dosage: '1/3 liều lượng (chia từ 1 viên/ngày)' };
-    afternoon.push(tripleXAfternoon as NutriliteProduct);
+  if (doubleXProduct) {
+    const doubleXAfternoon = { ...doubleXProduct, dosage: '1/3 liều lượng (chia từ liều khuyến nghị)' };
+    afternoon.push(doubleXAfternoon as NutriliteProduct);
   }
 
-  // Buổi tối: 1/3 Protein, 1/3 Omega-3, 1/3 Triple X
+  // Buổi tối: 1/3 Protein, 1/3 Omega-3, 1/3 Double X
   if (protein) {
     const proteinEvening = { ...protein, dosage: '1/3 liều lượng (chia từ liều khuyến nghị)' };
     evening.push(proteinEvening as NutriliteProduct);
@@ -79,9 +83,9 @@ export function generateRecommendations(answers: UserAnswers): RecommendationRes
     const omega3Evening = { ...omega3, dosage: '1/3 liều lượng (chia từ 1-2 viên/ngày)' };
     evening.push(omega3Evening as NutriliteProduct);
   }
-  if (tripleXProduct) {
-    const tripleXEvening = { ...tripleXProduct, dosage: '1/3 liều lượng (chia từ 1 viên/ngày)' };
-    evening.push(tripleXEvening as NutriliteProduct);
+  if (doubleXProduct) {
+    const doubleXEvening = { ...doubleXProduct, dosage: '1/3 liều lượng (chia từ liều khuyến nghị)' };
+    evening.push(doubleXEvening as NutriliteProduct);
   }
 
   // Tạo tóm tắt
@@ -287,7 +291,7 @@ function generateSummary(
   const nutritionTypes: string[] = [];
   if (needs.needsProtein) nutritionTypes.push('Đạm (Protein)');
   if (needs.needsOmega3) nutritionTypes.push('Chất béo (Omega-3)');
-  if (needs.needsVitamins) nutritionTypes.push('Vitamin và Khoáng chất (Triple X)');
+  if (needs.needsVitamins) nutritionTypes.push('Vitamin và Khoáng chất (Double X)');
   
   summary += nutritionTypes.join(', ') + '. ';
   
@@ -303,7 +307,7 @@ function generateSummary(
     summary += 'Omega-3 được phân bổ đều trong ngày để hỗ trợ sức khỏe tim mạch và não bộ. ';
   }
   
-  summary += 'Triple X được chia làm 3 lần trong ngày để đảm bảo cơ thể hấp thu vitamin và khoáng chất một cách tối ưu nhất. ';
+  summary += 'Double X được chia làm 3 lần trong ngày để đảm bảo cơ thể hấp thu vitamin và khoáng chất một cách tối ưu nhất. ';
   
   summary += 'Hãy tuân thủ liều lượng khuyến nghị và kết hợp với chế độ ăn uống cân bằng để đạt kết quả tốt nhất.';
   

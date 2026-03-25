@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-type Tab = 'menu' | 'customers';
+type Tab = 'menu' | 'customers' | 'manual';
 
 interface LayoutProps {
   children: ReactNode;
@@ -37,6 +37,16 @@ export default function Layout({ children, activeTab, onTabChange }: LayoutProps
                 }`}
               >
                 👥 Quản lý khách hàng
+              </button>
+              <button
+                onClick={() => onTabChange('manual')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeTab === 'manual'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                📚 Manual cho người mới
               </button>
             </div>
           </div>

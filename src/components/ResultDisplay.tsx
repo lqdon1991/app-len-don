@@ -184,7 +184,7 @@ function MealProductCard({ product }: { product: NutriliteProduct }) {
               <a className="underline" href={product.officialLink} target="_blank" rel="noopener noreferrer">
                 Amway Việt Nam
               </a>
-            ) : 'Amway Việt Nam'}
+            ) : 'Amway Việt Nam'} (không lo ngại vấn đề bản quyền vì mục đích minh hoạ)
           </p>
         </div>
         <div className="flex-1 min-w-0">
@@ -223,7 +223,7 @@ function ProductCard({ product }: { product: NutriliteProduct }) {
               <a className="underline" href={product.officialLink} target="_blank" rel="noopener noreferrer">
                 Amway Việt Nam
               </a>
-            ) : 'Amway Việt Nam'}
+            ) : 'Amway Việt Nam'} (không lo ngại vấn đề bản quyền vì mục đích minh hoạ)
           </p>
           {product.officialLink && (
             <a

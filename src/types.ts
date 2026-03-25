@@ -98,3 +98,18 @@ export interface Contact {
   createdAt: string;
   updatedAt: string;
 }
+
+// Manual/Library - Tài liệu & video cho người mới tham gia Amway
+export type ManualResourceSource = 'youtube' | 'amway';
+
+export interface ManualResource {
+  id: string;
+  title: string;
+  source: ManualResourceSource;
+  author?: string; // VD: "Vũ Hoàng Tâm"
+  url: string; // link gốc
+  embedUrl?: string; // nếu có (YouTube)
+  productNames: string[]; // để search theo tên sản phẩm
+  productCodes: string[]; // để search theo mã sản phẩm (VD: 110415)
+  freeKeywords: string[]; // search tự do
+}

@@ -89,29 +89,6 @@ export const nutriliteProducts: NutriliteProduct[] = [
     officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/Dinh-D%C6%B0%E1%BB%A1ng-Thi%E1%BA%BFt-Y%E1%BA%BFu-H%E1%BA%B1ng-Ng%C3%A0y/TP-BVSK-Nutrilite-Double-X/p/120843'
   },
   {
-    id: 'triple-x',
-    name: 'Nutrilite Triple X',
-    category: 'Vitamin và Khoáng chất',
-    description: 'Bổ sung vitamin và khoáng chất toàn diện với công thức 3 lớp độc đáo. Sản phẩm cung cấp đầy đủ các dưỡng chất thiết yếu từ nguồn thực vật tự nhiên, hỗ trợ tăng cường sức khỏe tổng thể và hệ miễn dịch.',
-    benefits: [
-      'Bổ sung đầy đủ vitamin và khoáng chất thiết yếu',
-      'Công thức 3 lớp độc đáo, hấp thu tối ưu',
-      'Hỗ trợ tăng cường sức đề kháng và hệ miễn dịch',
-      'Chống oxy hóa và bảo vệ tế bào khỏi tác hại của gốc tự do'
-    ],
-    recommendedFor: [
-      'Người muốn bổ sung dinh dưỡng toàn diện',
-      'Người có chế độ ăn thiếu rau củ quả',
-      'Người thường xuyên mệt mỏi hoặc căng thẳng',
-      'Người muốn tăng cường sức đề kháng'
-    ],
-    dosage: 'Uống 1 viên mỗi ngày cùng với bữa ăn để tăng cường hấp thu. Có thể chia làm 3 lần trong ngày để tối ưu hấp thu.',
-    imageUrl: '/images/products/double-x.png',
-    nutritionType: 'vitamin-mineral',
-    // Trang Triple X không luôn có trên catalog VN; dùng trang Double X chính thức để tham khảo nhóm vitamin-khoáng
-    officialLink: 'https://www.amway.com.vn/vn/Categories/Dinh-D%C6%B0%E1%BB%A1ng-V%C3%A0-S%E1%BB%A9c-Kh%E1%BB%8Fe/Dinh-D%C6%B0%E1%BB%A1ng-Thi%E1%BA%BFt-Y%E1%BA%BFu-H%E1%BA%B1ng-Ng%C3%A0y/TP-BVSK-Nutrilite-Double-X/p/120843'
-  },
-  {
     id: 'bodykey',
     name: 'BodyKey by Nutrilite',
     category: 'Dinh dưỡng toàn diện',
