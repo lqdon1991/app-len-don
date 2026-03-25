@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ManualResource, ManualResourceSource } from '../types';
+import { ManualResource, ManualResourceSource, UserRole } from '../types';
 import { manualDefaultResources } from '../data/manualDefaultResources';
 import { addUserManualResource, deleteUserManualResource, getUserManualResources, updateUserManualResource } from '../utils/manualStorage';
 import { toYoutubeEmbedUrl } from '../utils/youtube';
 
 type ManualFilter = 'all' | 'youtube' | 'amway';
 
-export default function ManualLibrary() {
+export default function ManualLibrary({ role }: { role: UserRole }) {
+  const canEdit = role === 'admin';
+
   const [userResources, setUserResources] = useState<ManualResource[]>([]);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<ManualFilter>('all');
@@ -31,6 +33,13 @@ export default function ManualLibrary() {
     const user = getUserManualResources();
     setUserResources(user);
   }, []);
+
+  useEffect(() => {
+    if (!canEdit) {
+      setShowAdd(false);
+      setEditingResourceId(null);
+    }
+  }, [canEdit]);
 
   const filteredResources = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -58,6 +67,7 @@ export default function ManualLibrary() {
   }, [resources, query, filter]);
 
   const handleAdd = () => {
+    if (!canEdit) return;
     if (!title.trim()) {
       alert('Vui lòng nhập tiêu đề');
       return;
@@ -130,6 +140,7 @@ export default function ManualLibrary() {
   };
 
   const handleEdit = (r: ManualResource) => {
+    if (!canEdit) return;
     if (isUserOwnedResource(r.id)) {
       setEditingResourceId(r.id);
       prefillFormFromResource(r);
@@ -161,6 +172,7 @@ export default function ManualLibrary() {
   };
 
   const handleDelete = (r: ManualResource) => {
+    if (!canEdit) return;
     if (!isUserOwnedResource(r.id)) return;
     const ok = deleteUserManualResource(r.id);
     if (!ok) return;
@@ -202,12 +214,16 @@ export default function ManualLibrary() {
           </div>
 
           <div className="flex gap-3">
-            <button
-              onClick={() => setShowAdd(prev => !prev)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold"
-            >
-              {showAdd ? 'Đóng' : '+ Thêm tài nguyên'}
-            </button>
+            {canEdit ? (
+              <button
+                onClick={() => setShowAdd(prev => !prev)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold"
+              >
+                {showAdd ? 'Đóng' : '+ Thêm tài nguyên'}
+              </button>
+            ) : (
+              <div className="text-sm text-gray-500 self-center">Chế độ xem</div>
+            )}
           </div>
         </div>
 
@@ -215,7 +231,7 @@ export default function ManualLibrary() {
           Hiển thị {filteredResources.length} / {resources.length} tài nguyên
         </div>
 
-        {showAdd && (
+        {showAdd && canEdit && (
           <div className="mt-5 border-t pt-5 space-y-4">
             <h2 className="font-semibold text-gray-800">
               {editingResourceId ? 'Chỉnh sửa tài nguyên (lưu trên trình duyệt)' : 'Thêm tài nguyên (lưu trên trình duyệt)'}
@@ -331,31 +347,33 @@ export default function ManualLibrary() {
             </div>
 
             <div className="mt-3 flex gap-2 flex-wrap">
-              {isUserOwnedResource(r.id) ? (
-                <>
+              {canEdit && (
+                isUserOwnedResource(r.id) ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(r)}
+                      className="px-3 py-1 text-xs bg-yellow-50 border border-yellow-300 text-yellow-900 rounded-lg hover:bg-yellow-100"
+                    >
+                      Sửa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(r)}
+                      className="px-3 py-1 text-xs bg-red-50 border border-red-300 text-red-800 rounded-lg hover:bg-red-100"
+                    >
+                      Xoá
+                    </button>
+                  </>
+                ) : (
                   <button
                     type="button"
                     onClick={() => handleEdit(r)}
-                    className="px-3 py-1 text-xs bg-yellow-50 border border-yellow-300 text-yellow-900 rounded-lg hover:bg-yellow-100"
+                    className="px-3 py-1 text-xs bg-blue-50 border border-blue-200 text-blue-900 rounded-lg hover:bg-blue-100"
                   >
-                    Sửa
+                    Tạo bản sao để sửa
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(r)}
-                    className="px-3 py-1 text-xs bg-red-50 border border-red-300 text-red-800 rounded-lg hover:bg-red-100"
-                  >
-                    Xoá
-                  </button>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleEdit(r)}
-                  className="px-3 py-1 text-xs bg-blue-50 border border-blue-200 text-blue-900 rounded-lg hover:bg-blue-100"
-                >
-                  Tạo bản sao để sửa
-                </button>
+                )
               )}
             </div>
 

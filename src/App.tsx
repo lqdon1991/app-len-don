@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from './components/Layout';
 import QuestionForm from './components/QuestionForm';
 import ResultDisplay from './components/ResultDisplay';
@@ -6,13 +6,33 @@ import CustomerManagement from './components/CustomerManagement';
 import { UserAnswers, RecommendationResult } from './types';
 import { generateRecommendations } from './utils/recommendation';
 import ManualLibrary from './components/ManualLibrary';
+import Login from './components/Login';
+import AccountManagement from './components/AccountManagement';
+import { getCurrentSessionUser, logout } from './utils/authStorage';
+import { AppUser, UserRole } from './types';
 
-type Tab = 'menu' | 'customers' | 'manual';
+type Tab = 'menu' | 'customers' | 'manual' | 'account';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('menu');
   const [result, setResult] = useState<RecommendationResult | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
+
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
+  const role: UserRole = currentUser?.role ?? 'user';
+
+  useEffect(() => {
+    setCurrentUser(getCurrentSessionUser());
+  }, []);
+
+  useEffect(() => {
+    // Nếu user không có quyền, đưa về tab xem
+    if (!currentUser) return;
+    const isAdmin = currentUser.role === 'admin';
+    if (!isAdmin && (activeTab === 'customers' || activeTab === 'account')) {
+      setActiveTab('menu');
+    }
+  }, [currentUser, activeTab]);
 
   const handleComplete = (answers: UserAnswers) => {
     try {
@@ -26,6 +46,14 @@ function App() {
   };
 
   const handleRestart = () => {
+    setResult(null);
+    setShowWelcome(true);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setCurrentUser(null);
+    setActiveTab('menu');
     setResult(null);
     setShowWelcome(true);
   };
@@ -69,13 +97,16 @@ function App() {
     return <QuestionForm onComplete={handleComplete} />;
   };
 
+  if (!currentUser) {
+    return <Login onLogin={(u) => setCurrentUser(u)} />;
+  }
+
   return (
-    <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {activeTab === 'menu'
-        ? renderMenuContent()
-        : activeTab === 'customers'
-          ? <CustomerManagement />
-          : <ManualLibrary />}
+    <Layout activeTab={activeTab} onTabChange={setActiveTab} role={role} onLogout={handleLogout}>
+      {activeTab === 'menu' && renderMenuContent()}
+      {activeTab === 'manual' && <ManualLibrary role={role} />}
+      {activeTab === 'customers' && currentUser.role === 'admin' && <CustomerManagement />}
+      {activeTab === 'account' && currentUser.role === 'admin' && <AccountManagement />}
     </Layout>
   );
 }

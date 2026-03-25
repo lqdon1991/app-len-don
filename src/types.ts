@@ -113,3 +113,12 @@ export interface ManualResource {
   productCodes: string[]; // để search theo mã sản phẩm (VD: 110415)
   freeKeywords: string[]; // search tự do
 }
+
+// Auth - Quản lý tài khoản
+export type UserRole = 'admin' | 'user';
+
+export interface AppUser {
+  id: string;
+  username: string;
+  role: UserRole;
+}
