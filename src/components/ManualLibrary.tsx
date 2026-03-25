@@ -242,14 +242,9 @@ export default function ManualLibrary() {
                   {r.author ? ` • ${r.author}` : ''}
                 </div>
               </div>
-              <a
-                href={r.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm whitespace-nowrap"
-              >
-                Mở trang
-              </a>
+              <div className="text-xs text-gray-400 whitespace-nowrap">
+                {r.source === 'youtube' ? 'Embed hiển thị ngay' : 'Nguồn tham khảo'}
+              </div>
             </div>
 
             {r.source === 'youtube' && r.embedUrl && (
@@ -263,6 +258,12 @@ export default function ManualLibrary() {
                     allowFullScreen
                   />
                 </div>
+              </div>
+            )}
+
+            {r.source === 'youtube' && !r.embedUrl && (
+              <div className="mt-4 text-sm text-gray-500">
+                Chưa có embedUrl. Hãy dùng tính năng “+ Thêm tài nguyên” để dán link YouTube.
               </div>
             )}
 
