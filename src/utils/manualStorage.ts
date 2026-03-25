@@ -33,3 +33,41 @@ export function addUserManualResource(
   }
 }
 
+export function updateUserManualResource(
+  id: string,
+  updates: Omit<ManualResource, 'id'>
+): ManualResource | null {
+  try {
+    const current = getUserManualResources();
+    const index = current.findIndex(r => r.id === id);
+    if (index === -1) return null;
+
+    const next: ManualResource = {
+      ...current[index],
+      ...updates,
+      id
+    };
+
+    const result = [...current];
+    result[index] = next;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+    return next;
+  } catch (error) {
+    console.error('Failed to update manual resource:', error);
+    return null;
+  }
+}
+
+export function deleteUserManualResource(id: string): boolean {
+  try {
+    const current = getUserManualResources();
+    const next = current.filter(r => r.id !== id);
+    if (next.length === current.length) return false;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    return true;
+  } catch (error) {
+    console.error('Failed to delete manual resource:', error);
+    return false;
+  }
+}
+

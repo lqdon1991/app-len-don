@@ -1,16 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ManualResource, ManualResourceSource } from '../types';
 import { manualDefaultResources } from '../data/manualDefaultResources';
-import { addUserManualResource, getUserManualResources } from '../utils/manualStorage';
+import { addUserManualResource, deleteUserManualResource, getUserManualResources, updateUserManualResource } from '../utils/manualStorage';
 import { toYoutubeEmbedUrl } from '../utils/youtube';
 
 type ManualFilter = 'all' | 'youtube' | 'amway';
 
 export default function ManualLibrary() {
-  const [resources, setResources] = useState<ManualResource[]>(manualDefaultResources);
+  const [userResources, setUserResources] = useState<ManualResource[]>([]);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<ManualFilter>('all');
   const [showAdd, setShowAdd] = useState(false);
+  const [editingResourceId, setEditingResourceId] = useState<string | null>(null);
+
+  const resources = useMemo(
+    () => [...manualDefaultResources, ...userResources],
+    [userResources]
+  );
 
   // Add form state
   const [title, setTitle] = useState('');
@@ -23,7 +29,7 @@ export default function ManualLibrary() {
 
   useEffect(() => {
     const user = getUserManualResources();
-    setResources([...manualDefaultResources, ...user]);
+    setUserResources(user);
   }, []);
 
   const filteredResources = useMemo(() => {
@@ -81,14 +87,89 @@ export default function ManualLibrary() {
     });
 
     if (!saved) return;
-    setResources(prev => [...prev, saved]);
+
+    if (editingResourceId) {
+      const updated = updateUserManualResource(editingResourceId, {
+        title: title.trim(),
+        author: author.trim() || undefined,
+        source,
+        url: url.trim(),
+        embedUrl: embedUrl || undefined,
+        productNames: toList(productNames),
+        productCodes: toList(productCodes),
+        freeKeywords: toList(freeKeywords)
+      });
+
+      if (updated) {
+        setUserResources(prev => prev.map(r => (r.id === editingResourceId ? updated : r)));
+      }
+    } else {
+      setUserResources(prev => [...prev, saved]);
+    }
+
     setShowAdd(false);
+    setEditingResourceId(null);
     setTitle('');
     setAuthor('');
     setUrl('');
     setProductNames('');
     setProductCodes('');
     setFreeKeywords('');
+  };
+
+  const isUserOwnedResource = (id: string) => userResources.some(r => r.id === id);
+
+  const prefillFormFromResource = (r: ManualResource) => {
+    setTitle(r.title);
+    setAuthor(r.author || '');
+    setSource(r.source);
+    setUrl(r.url);
+    setProductNames(r.productNames.join(', '));
+    setProductCodes(r.productCodes.join(', '));
+    setFreeKeywords(r.freeKeywords.join(', '));
+  };
+
+  const handleEdit = (r: ManualResource) => {
+    if (isUserOwnedResource(r.id)) {
+      setEditingResourceId(r.id);
+      prefillFormFromResource(r);
+      setShowAdd(true);
+      return;
+    }
+
+    // Tạo bản sao để cho phép sửa (tránh sửa trực tiếp tài nguyên mặc định)
+    const copied = addUserManualResource({
+      title: r.title,
+      author: r.author,
+      source: r.source,
+      url: r.url,
+      embedUrl: r.embedUrl,
+      productNames: r.productNames,
+      productCodes: r.productCodes,
+      freeKeywords: r.freeKeywords,
+    });
+
+    if (!copied) {
+      alert('Không thể tạo bản sao để chỉnh sửa.');
+      return;
+    }
+
+    setUserResources(prev => [...prev, copied]);
+    setEditingResourceId(copied.id);
+    prefillFormFromResource(copied);
+    setShowAdd(true);
+  };
+
+  const handleDelete = (r: ManualResource) => {
+    if (!isUserOwnedResource(r.id)) return;
+    const ok = deleteUserManualResource(r.id);
+    if (!ok) return;
+    setUserResources(prev => prev.filter(x => x.id !== r.id));
+
+    if (editingResourceId === r.id) {
+      setEditingResourceId(null);
+      setShowAdd(false);
+    }
   };
 
   return (
@@ -136,7 +217,9 @@ export default function ManualLibrary() {
 
         {showAdd && (
           <div className="mt-5 border-t pt-5 space-y-4">
-            <h2 className="font-semibold text-gray-800">Thêm tài nguyên (lưu trên trình duyệt)</h2>
+            <h2 className="font-semibold text-gray-800">
+              {editingResourceId ? 'Chỉnh sửa tài nguyên (lưu trên trình duyệt)' : 'Thêm tài nguyên (lưu trên trình duyệt)'}
+            </h2>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -214,7 +297,7 @@ export default function ManualLibrary() {
                 onClick={handleAdd}
                 className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold"
               >
-                Lưu tài nguyên
+                {editingResourceId ? 'Lưu thay đổi' : 'Lưu tài nguyên'}
               </button>
               <button
                 onClick={() => setShowAdd(false)}
@@ -245,6 +328,35 @@ export default function ManualLibrary() {
               <div className="text-xs text-gray-400 whitespace-nowrap">
                 {r.source === 'youtube' ? 'Embed hiển thị ngay' : 'Nguồn tham khảo'}
               </div>
+            </div>
+
+            <div className="mt-3 flex gap-2 flex-wrap">
+              {isUserOwnedResource(r.id) ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(r)}
+                    className="px-3 py-1 text-xs bg-yellow-50 border border-yellow-300 text-yellow-900 rounded-lg hover:bg-yellow-100"
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(r)}
+                    className="px-3 py-1 text-xs bg-red-50 border border-red-300 text-red-800 rounded-lg hover:bg-red-100"
+                  >
+                    Xoá
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleEdit(r)}
+                  className="px-3 py-1 text-xs bg-blue-50 border border-blue-200 text-blue-900 rounded-lg hover:bg-blue-100"
+                >
+                  Tạo bản sao để sửa
+                </button>
+              )}
             </div>
 
             {r.source === 'youtube' && r.embedUrl && (
