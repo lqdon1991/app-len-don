@@ -6,7 +6,11 @@ export function getContacts(): Contact[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data) as Contact[];
+      return parsed.map(contact => ({
+        ...contact,
+        crosslineIds: contact.crosslineIds || [],
+      }));
     }
   } catch (error) {
     console.error('Error loading contacts:', error);
@@ -29,6 +33,7 @@ export function addContact(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedA
     ...contact,
     id: `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     purchaseHistory: contact.purchaseHistory || [],
+    crosslineIds: contact.crosslineIds || [],
     createdAt: now,
     updatedAt: now,
   };
@@ -54,8 +59,18 @@ export function updateContact(id: string, updates: Partial<Contact>): Contact | 
 }
 
 export function deleteContact(id: string): boolean {
-  const contacts = getContacts().filter(c => c.id !== id);
-  if (contacts.length === getContacts().length) return false;
+  const current = getContacts();
+  const exists = current.some(c => c.id === id);
+  if (!exists) return false;
+
+  const contacts = current
+    .filter(c => c.id !== id)
+    .map(c => ({
+      ...c,
+      uplineId: c.uplineId === id ? undefined : c.uplineId,
+      crosslineIds: (c.crosslineIds || []).filter(crossId => crossId !== id),
+    }));
+
   saveContacts(contacts);
   return true;
 }

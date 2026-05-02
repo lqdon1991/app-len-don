@@ -10,6 +10,7 @@ export interface PurchaseRecord {
   id: string;
   date: string;
   description: string;
+  pv?: number;
   amount?: number;
   notes?: string;
 }
@@ -24,6 +25,8 @@ export interface Contact {
   hasCar: boolean;
   category: ContactCategory;
   purchaseHistory: PurchaseRecord[];
+  uplineId?: string;
+  crosslineIds: string[];
   phone?: string;
   email?: string;
   address?: string;

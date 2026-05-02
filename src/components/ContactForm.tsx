@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Contact, ContactCategory, PurchaseRecord } from '../types/erp';
 import { contactCategoryOptions } from '../data/contactCategories';
 
 interface ContactFormProps {
   contact?: Contact | null;
+  contacts: Contact[];
+  presetUplineId?: string;
   onSave: (contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
 }
@@ -17,13 +19,21 @@ const emptyContact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'> = {
   hasCar: false,
   category: 'friends',
   purchaseHistory: [],
+  uplineId: undefined,
+  crosslineIds: [],
   phone: '',
   email: '',
   address: '',
   notes: '',
 };
 
-export default function ContactForm({ contact, onSave, onCancel }: ContactFormProps) {
+export default function ContactForm({ contact, contacts, presetUplineId, onSave, onCancel }: ContactFormProps) {
+  const currentId = contact?.id;
+  const selectableContacts = useMemo(
+    () => contacts.filter(c => c.id !== currentId),
+    [contacts, currentId]
+  );
+
   const [formData, setFormData] = useState<Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>>(
     contact ? {
       name: contact.name,
@@ -34,16 +44,24 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
       hasCar: contact.hasCar,
       category: contact.category,
       purchaseHistory: contact.purchaseHistory,
+      uplineId: contact.uplineId,
+      crosslineIds: contact.crosslineIds || [],
       phone: contact.phone || '',
       email: contact.email || '',
       address: contact.address || '',
       notes: contact.notes || '',
-    } : { ...emptyContact }
+    } : { ...emptyContact, uplineId: presetUplineId }
   );
 
-  const [newPurchase, setNewPurchase] = useState<{ date: string; description: string; amount: string; notes: string }>({ date: '', description: '', amount: '', notes: '' });
+  const [newPurchase, setNewPurchase] = useState<{ date: string; description: string; pv: string; amount: string; notes: string }>({
+    date: '',
+    description: '',
+    pv: '',
+    amount: '',
+    notes: '',
+  });
 
-  const handleChange = (field: keyof typeof formData, value: string | number | boolean | PurchaseRecord[] | undefined) => {
+  const handleChange = (field: keyof typeof formData, value: string | number | boolean | PurchaseRecord[] | string[] | undefined) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -53,11 +71,12 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
       id: `purchase_${Date.now()}`,
       date: newPurchase.date,
       description: newPurchase.description,
+      pv: newPurchase.pv ? parseFloat(newPurchase.pv) : undefined,
       amount: newPurchase.amount ? parseFloat(newPurchase.amount) : undefined,
       notes: newPurchase.notes || undefined,
     };
     handleChange('purchaseHistory', [...formData.purchaseHistory, record]);
-    setNewPurchase({ date: '', description: '', amount: '', notes: '' });
+    setNewPurchase({ date: '', description: '', pv: '', amount: '', notes: '' });
   };
 
   const handleRemovePurchase = (id: string) => {
@@ -100,6 +119,36 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upline (cấp trên)</label>
+            <select
+              value={formData.uplineId || ''}
+              onChange={(e) => handleChange('uplineId', e.target.value || undefined)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Không có</option>
+              {selectableContacts.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Crossline (cùng cấp)</label>
+            <select
+              multiple
+              value={formData.crosslineIds}
+              onChange={(e) => {
+                const selected = Array.from(e.target.selectedOptions).map(option => option.value);
+                handleChange('crosslineIds', selected);
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 min-h-28"
+            >
+              {selectableContacts.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Giữ Cmd/Ctrl để chọn nhiều người.</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Tuổi</label>
@@ -199,7 +248,7 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Lịch sử mua hàng</h2>
         <div className="space-y-4">
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Ngày mua</label>
               <input
@@ -217,6 +266,16 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
                 onChange={(e) => setNewPurchase(p => ({ ...p, description: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 placeholder="Sản phẩm đã mua"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">PV</label>
+              <input
+                type="number"
+                value={newPurchase.pv}
+                onChange={(e) => setNewPurchase(p => ({ ...p, pv: e.target.value }))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                placeholder="Điểm PV"
               />
             </div>
             <div>
@@ -247,6 +306,7 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
                   <tr>
                     <th className="px-4 py-2 text-left">Ngày</th>
                     <th className="px-4 py-2 text-left">Mô tả</th>
+                    <th className="px-4 py-2 text-left">PV</th>
                     <th className="px-4 py-2 text-left">Số tiền</th>
                     <th className="px-4 py-2 w-20"></th>
                   </tr>
@@ -256,6 +316,7 @@ export default function ContactForm({ contact, onSave, onCancel }: ContactFormPr
                     <tr key={record.id} className="border-t">
                       <td className="px-4 py-2">{new Date(record.date).toLocaleDateString('vi-VN')}</td>
                       <td className="px-4 py-2">{record.description}</td>
+                      <td className="px-4 py-2">{record.pv ?? '-'}</td>
                       <td className="px-4 py-2">{record.amount ? record.amount.toLocaleString('vi-VN') : '-'}</td>
                       <td className="px-4 py-2">
                         <button

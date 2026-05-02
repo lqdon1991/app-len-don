@@ -22,6 +22,7 @@ export default function ContactList({ contacts, onEdit, onDelete, onAddNew }: Co
       (c.notes && c.notes.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchCategory && matchSearch;
   });
+  const contactMap = new Map(contacts.map(c => [c.id, c]));
 
   return (
     <div className="space-y-6">
@@ -95,6 +96,19 @@ export default function ContactList({ contacts, onEdit, onDelete, onAddNew }: Co
                     {contact.phone && (
                       <p className="text-sm text-gray-600 mt-1">📞 {contact.phone}</p>
                     )}
+                    <div className="text-sm text-gray-600 mt-1 space-y-1">
+                      <p>
+                        Upline: {contact.uplineId ? (contactMap.get(contact.uplineId)?.name || 'N/A') : 'Không có'}
+                      </p>
+                      <p>
+                        Downline: {contacts.filter(c => c.uplineId === contact.id).length}
+                      </p>
+                      <p>
+                        Crossline: {contact.crosslineIds.length === 0
+                          ? 'Không có'
+                          : contact.crosslineIds.map(id => contactMap.get(id)?.name || id).join(', ')}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -129,6 +143,7 @@ export default function ContactList({ contacts, onEdit, onDelete, onAddNew }: Co
                       <tr className="text-left text-gray-600">
                         <th className="pb-2">Thời gian</th>
                         <th className="pb-2">Mô tả</th>
+                        <th className="pb-2">PV</th>
                         <th className="pb-2">Số tiền</th>
                       </tr>
                     </thead>
@@ -137,6 +152,7 @@ export default function ContactList({ contacts, onEdit, onDelete, onAddNew }: Co
                         <tr key={record.id} className="border-t">
                           <td className="py-2">{new Date(record.date).toLocaleDateString('vi-VN')}</td>
                           <td className="py-2">{record.description}</td>
+                          <td className="py-2">{record.pv ?? '-'}</td>
                           <td className="py-2">{record.amount ? record.amount.toLocaleString('vi-VN') + ' đ' : '-'}</td>
                         </tr>
                       ))}
